@@ -1,9 +1,4 @@
-# -*- coding: utf-8 -*-
-"""
-Created on Tue Jan 23 02:18:10 2024
-
-@author: Luiz
-"""
+days.rst
 
 data/gfs.0p25.2023010100.f000.grib2
 data/*
