@@ -56,8 +56,9 @@ def save_wind_components_to_xarray(grib_file_path):
     return ds
 
 
-grib_file_path =  'gfs.0p25.2023010100.f000.grib2'
+path =  'gfs.0p25.2023010100.f000.grib2'
 
-ds = save_wind_components_to_xarray(grib_file_path)
+# ds = save_wind_components_to_xarray(path)
 
-ds.to_netcdf('wind_components_data.nc')
+
+# ds.to_netcdf('wind_components_data.nc')

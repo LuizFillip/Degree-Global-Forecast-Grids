@@ -10,7 +10,7 @@ from urllib.request import build_opener
 opener = build_opener()
 
 filelist = [
-  'https://data.rda.ucar.edu/ds084.1/2022/20220716/gfs.0p25.2022071600.f000.grib2'
+  'https://data.rda.ucar.edu/ds084.1/2022/20220716/gfs.0p25.2022071618.f000.grib2'
 ]
 
 for file in filelist:
