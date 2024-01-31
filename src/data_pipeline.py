@@ -1,62 +1,118 @@
 import xarray as xr
-
-ds = xr.open_dataset('NCEP_GFS/data/gfs.0p25.2022071618.f000.nc')
-
-ds['longitude'] = ds['longitude'] - 180
-
-#%%%%
-import cartopy.crs as ccrs
-import datetime as dt
 import matplotlib.pyplot as plt
-import GEO as gg 
+import pandas as pd 
+import base as b 
+import os 
 
-fig, ax = plt.subplots(
-     figsize = (17, 12), 
-     dpi = 300, 
-     subplot_kw = 
-     {'projection': ccrs.PlateCarree()}
-     )
+b.config_labels()
 
 
-lat_lims = dict(min = -9, max = -6, stp = 1)
-lon_lims = dict(min = -37, max = -34, stp = 1) 
+def loadData(file):
+    
+    ds = xr.open_dataset(file)
+    
+    ds['longitude'] = ds['longitude'] - 180
+    
+    xlim = [-34.66, -35.25]
+    ylim = [-7.5, -6.916]
+    
+    return ds.sel(
+        latitude= (
+            (ds.latitude > ylim[0]) & 
+            (ds.latitude < ylim[1])), 
+        longitude = (
+            (ds.longitude < xlim[0]) &
+            (ds.longitude > xlim[1]))
+                )
+    
+import numpy as np 
 
 
-gg.map_attrs(
-    ax, 
-    lat_lims = lat_lims, 
-    lon_lims = lon_lims,
-    year = 2022, grid = False
-    )
+def plot_components(ax, df):
+    
+    time = pd.to_datetime(df['time'].values)
+    
+    u = [i.mean() for i in df['u'].values]
+    v = [i.mean() for i in  df['v'].values]
+    
+    
+    title = time.strftime('%d/%m/%Y %Hh%M UT')
+    
+    alts = df.isobaricInhPa
+    ax.plot(u, alts, 
+            label = 'u component')
+    
+    ax.plot(v, alts , 
+            label = 'v component')
+    
+    ax.set(xlabel = 'Velocity (m/s)', 
+           xlim = [-10, 10],
+           ylim = [650, 1000], 
+           xticks = np.arange(-10, 15, 5),
+           title = title)
+    
+    plt.gca().invert_yaxis()
+    
+    
 
 
 
-lon_min, lon_max = -40,  -34
-lat_min, lat_max = -10, -5
-
-df = ds.sel(isobaricInhPa = 900,
-            latitude= (
-                (ds.latitude > lat_min) & 
-                (ds.latitude < lat_max)), 
-            longitude = (
-                (ds.longitude < lon_max) &
-                (ds.longitude > lon_min))
+def plot(path, files):
+    
+    fig, ax = plt.subplots(
+          figsize = (18, 12), 
+          dpi = 300, 
+          sharex =  True, 
+          sharey= True,
+          ncols = 3, 
+          nrows = 2
+          )
+    
+    plt.subplots_adjust(wspace = 0.1)
+    
+    for i, ax in enumerate(ax.flat):
+    
+        infile = os.path.join(
+            path, files[i]
             )
+        ds = loadData(infile)
+        
+        ax.axvline(0, linestyle = '--')
+        
+        plot_components(ax, ds)
+        
+        if i == 0:
+            ax.legend(
+                ncol = 2,
+                loc = 'upper center',
+                bbox_to_anchor = (2.3, 1.3)
+                )
+            
+            ax.set(ylabel = 'Isobaric height (hPa)')
+            
+        
+        
+    fig.savefig('NCEP_GFS/img/all_profiles.png')
+    
+# infile = 'NCEP_GFS/data/gfs.0p25.2021092218.f000.nc'
 
-xlim = [-34.66, -35.25]
-ylim = [-7.5, -6.916]
-gg.plot_square_area(
-        ax, 
-        lat_min = ylim[0], 
-        lon_min = xlim[0],
-        lat_max = ylim[1], 
-        lon_max = xlim[1]
-        )
+path = 'NCEP_GFS/data/'
 
+files = sorted(os.listdir(path))
 
-# df1= df.sel(longitude = (ds.longitude < -30))
+plot(path, files)
 
+# infile = os.path.join(
+#     path, files[6]
+#     )
 
-df['u'].plot(ax = ax)
+# ds = loadData(infile)
+# 
+# fig, ax = plt.subplots()
+# plot_components(ax, ds)
 
-# df
+# infile= 'NCEP_GFS/gfs.0p25.2019062106.f000.nc'
+
+# ds = xr.open_dataset(infile)
+
+# ds, infile 

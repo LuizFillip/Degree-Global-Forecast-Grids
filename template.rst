@@ -21,3 +21,7 @@ Como o vento Ã© predominantemente de sudeste, e praticamente uniforme em toda a 
 ##
 
 Grid: 0.25° x 0.25° from 0E to 359.75E and 90N to 90S (1440 x 721 Longitude/Latitude)
+
+Os dias 2019-06-21T06:00:00
+
+04/07/2019 (10:01h UT) 
