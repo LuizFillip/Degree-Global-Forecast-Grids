@@ -3,14 +3,10 @@ import numpy as np
 import base as b 
 import cartopy.crs as ccrs
 import matplotlib.pyplot as plt 
+import xarray as xr
 
 def mapping(lon_min, lon_max, lat_min, lat_max):
     
-    lon_min, lon_max = -70, -30
-    lat_min, lat_max = -40, 10
-
-
-
     
     fig, ax = plt.subplots(
          figsize = (17, 12), 
@@ -62,17 +58,17 @@ def plot_maps_contour(
     level = np.linspace(-vmax, vmax, 50)
     
     for i, wind in enumerate(['u', 'v']):
-        name = df[wind].attrs['GRIB_name']
+        # name = df[wind].attrs['GRIB_name']
         
         ax[i].contourf(
-            df.longitude, 
-            df.latitude, 
+            df.longitudes, 
+            df.latitudes, 
             df[wind].values, 
             levels = level,
             cmap = 'jet'
             )
         
-        ax[i].set(title = name)
+        ax[i].set(title = wind + ' component')
     
     
     
@@ -85,3 +81,20 @@ def plot_maps_contour(
             step = 10,
             label = r'Velocity (m/s)'
             )
+    
+file = 'NCEP_GFS/data/gfs.0p25.2017071018.f000.nc'
+
+ds = xr.open_dataset(file)
+
+ds = ds.sel(level = 900)
+ds['longitudes'] = ds['longitudes'] - 180
+
+
+lon_min, lon_max = -70, -30
+lat_min, lat_max = -40, 10
+
+plot_maps_contour(
+        ds, 
+        lat_min, lat_max,
+        lon_min, lon_max
+        )
